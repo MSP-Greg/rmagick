@@ -21,7 +21,12 @@ module RMagick
     end
 
     def setup_pkg_config_path
-      return if RUBY_PLATFORM =~ /mswin|mingw/
+      return if RUBY_PLATFORM =~ /mswin/
+
+      if RUBY_PLATFORM =~ /mingw/
+        ENV['PKG_CONFIG_PATH'] =  'C:/Greg/msys64/mingw64/lib/pkgconfig'
+        return
+      end
 
       if find_executable('brew')
         pkg_config_path = "#{`brew --prefix imagemagick@6`.strip}/lib/pkgconfig"
@@ -63,7 +68,7 @@ module RMagick
 
     def configure_compile_options
       # Magick-config is not available on Windows
-      if RUBY_PLATFORM !~ /mswin|mingw/
+      if RUBY_PLATFORM !~ /mswin/
 
         check_multiple_imagemagick_versions
         check_partial_imagemagick_versions
@@ -286,7 +291,7 @@ module RMagick
         Check the mkmf.log file for more detailed information.
       END_FAILURE
 
-      if RUBY_PLATFORM !~ /mswin|mingw/
+      if RUBY_PLATFORM !~ /mswin/
         unless find_executable('pkg-config')
           exit_failure "Can't install RMagick #{RMAGICK_VERS}. Can't find pkg-config in #{ENV['PATH']}\n"
         end
@@ -316,11 +321,10 @@ module RMagick
       ruby_api = [
         'rb_gc_adjust_memory_usage' # Ruby 2.4.0
       ]
-      memory_api = %w[
+      posix_api = %w[
         posix_memalign
         malloc_usable_size
         malloc_size
-        _aligned_msize
       ]
       imagemagick_api = [
         'GetImageChannelEntropy', # 6.9.0-0
@@ -328,7 +332,8 @@ module RMagick
         'SetMagickAlignedMemoryMethods' # 7.0.9-0
       ]
 
-      check_api = ruby_api + memory_api + imagemagick_api
+      check_api = ruby_api + imagemagick_api
+      check_api += posix_api unless RUBY_PLATFORM =~ /mswin|mingw/
       check_api.each do |func|
         have_func(func, headers)
       end
