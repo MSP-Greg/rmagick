@@ -20,7 +20,7 @@ jobs:
         uses: MSP-Greg/setup-ruby-pkgs@v1
         with:
           ruby-version: ${{ matrix.ruby }}
-          mingw: _upgrade_ imagemagick
+          mingw: _upgrade_ ghostscript imagemagick
       
       - run: bundle install
       - run: bundle exec rake compile
