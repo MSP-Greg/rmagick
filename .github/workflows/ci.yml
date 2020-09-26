@@ -16,12 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
     
-    - name: load ruby, imagemagick
-      uses: MSP-Greg/setup-ruby-pkgs@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-        mingw: _upgrade_ imagemagick
-    
-    - run: bundle install
-    - run: bundle exec rake compile
-    - run: bundle exec rake spec
+      - name: load ruby, imagemagick
+        uses: MSP-Greg/setup-ruby-pkgs@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          mingw: _upgrade_ imagemagick
+      
+      - run: bundle install
+      - run: bundle exec rake compile
+      - run: bundle exec rake spec
